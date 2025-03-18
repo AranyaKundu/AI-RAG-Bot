@@ -1,0 +1,9 @@
+streamlit>=1.43.2
+streamlit_extras>=0.5.5
+python-dotenv>=1.0.0
+openai>=1.66.3
+langchain>=0.3.19
+langchain_community>=0.3.18
+docx>=1.1.2
+chromadb>=0.6.3
+
