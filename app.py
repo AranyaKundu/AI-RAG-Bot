@@ -1,6 +1,5 @@
 import time, uuid, shutil, os
 from datetime import datetime
-from dotenv import load_dotenv
 import streamlit as st
 from streamlit_extras.stylable_container import stylable_container
 from fileprocessing import process_document
@@ -9,7 +8,7 @@ from llms import call_llm, call_reasoning_llm, search_web
 from uservalidate import create_users_table, verify_user, add_user, get_user_cost
 from chatFunctions import save_chat_sessions, load_chat_sessions
 
-load_dotenv()
+
 
 # Get the API Key
 api_key = os.getenv("API_KEY")
