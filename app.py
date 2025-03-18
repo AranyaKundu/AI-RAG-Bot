@@ -1,3 +1,8 @@
+import pysqlite3 as sqlite3
+import sys
+sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
+
+
 import time, uuid, shutil, os
 from datetime import datetime
 import streamlit as st
@@ -11,7 +16,7 @@ from chatFunctions import save_chat_sessions, load_chat_sessions
 
 
 # Get the API Key
-api_key = os.getenv("API_KEY")
+api_key = st.secrets["api_keys"]["openai"]
 
 
 # App specific codes: Design & Additional Features
