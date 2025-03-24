@@ -13,6 +13,7 @@ beautifulsoup4>=4.12.2
 requests>=2.31.0
 pytesseract>=0.3.13
 pyunpack>=0.3
+patool>=4.0.0
 pysqlite3-binary
 pymupdf
 ocrmypdf
