@@ -81,7 +81,7 @@ def call_reasoning_llm(context: str, prompt: str, api_key: str, temperature=0.1)
             {'role': 'developer', 'content': system_prompt},
             {"role": "user", "content": f"Context: {context}\nQuestion: {prompt}"}
         ],
-        max_completion_tokens=64,
+        max_completion_tokens=1000,
         stream=True,
         stream_options= {"include_usage": True}
     )
