@@ -139,18 +139,24 @@ def user_page(username):
         thinking_type = "primary" if st.session_state.thinking else "secondary"
         search_type = "primary" if st.session_state.search else "secondary"
         image_type = "primary" if st.session_state.image else "secondary"
-            
-        if col1.button("💡 Reason", key="toggle_thinking", type=thinking_type):
-            st.session_state.thinking = not st.session_state.thinking
-            st.rerun()
-            
-        if col2.button("🔍 Search", key="toggle_search", type=search_type):
-            st.session_state.search = not st.session_state.search
-            st.rerun()
-        
-        if col3.button("📷 Image", key="toggle_image", type=image_type, disabled = st.session_state.thinking or st.session_state.search):
-            st.session_state.image = not st.session_state.image
-            st.rerun()
+
+        with col1:
+            reason_button = st.button("💡 Reason", key="toggle_thinking", type=thinking_type)
+            if reason_button:
+                st.session_state.thinking = not st.session_state.thinking
+                st.rerun()
+
+        with col2:
+            search_button = st.button("🔍 Search", key="toggle_search", type=search_type)
+            if search_button:
+                st.session_state.search = not st.session_state.search
+                st.rerun()
+
+        with col3:
+            image_button = st.button("📷 Image", key="toggle_image", type=image_type, disabled = st.session_state.thinking or st.session_state.search)
+            if image_button:
+                st.session_state.image = not st.session_state.image
+                st.rerun()
 
     # Process file input first, if any
     if prompt and prompt.get("files") and prompt.get('text'):
