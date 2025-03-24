@@ -139,7 +139,7 @@ def user_page(username):
         thinking_type = "primary" if st.session_state.thinking else "secondary"
         search_type = "primary" if st.session_state.search else "secondary"
         image_type = "primary" if st.session_state.image else "secondary"
-        
+            
         if col1.button("💡 Reason", key="toggle_thinking", type=thinking_type):
             st.session_state.thinking = not st.session_state.thinking
             st.rerun()
@@ -148,7 +148,7 @@ def user_page(username):
             st.session_state.search = not st.session_state.search
             st.rerun()
         
-        if col3.button("📷 Image", key="toggle_image", type=image_type):
+        if col3.button("📷 Image", key="toggle_image", type=image_type, disabled = st.session_state.thinking or st.session_state.search):
             st.session_state.image = not st.session_state.image
             st.rerun()
 
