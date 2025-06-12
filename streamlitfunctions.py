@@ -1,10 +1,10 @@
 import re
 import streamlit as st
 from chatFunctions import save_chat_sessions, delete_chat
-from vectordb import query_collection
 from llms import call_llm, call_reasoning_llm, search_web, crawl_website, generate_images
 from styles import get_latex_styles
 from fileprocessing import process_document
+from vectordb import query_collection
 
 # Get the API Key
 api_key = st.secrets["api_keys"]["openai"]
@@ -53,7 +53,6 @@ def summarize_text(context: str, api_key: str):
     return summary
 
 
-
 # App specific codes: Design & Additional Features
 def query_and_display_response(prompt, reasoning=False, search=False, images=False):
     if images:
@@ -78,11 +77,21 @@ def query_and_display_response(prompt, reasoning=False, search=False, images=Fal
         context = prompt
     # Handle URL crawling if URLs found and search is enabled
     elif urls and len(urls) > 0 and search:
-        spinner_placeholder.info(f"Crawling websites: {urls[0]}...")
+        spinner_placeholder.info(f"Crawling website(s): {urls[0]}...")
         crawl_results = crawl_website(urls[0], max_depth=1)
         if crawl_results:
-            crawled_context = "\n\n".join([f"From {url}: {content[:1000]}..." for url, content in crawl_results.items()])
+            crawled_context = "\n\n".join([f"From {url}: {content[:2000]}..." for url, content in crawl_results.items()])
             context = crawled_context
+    # Handle search if search is enabled and no url found in prompt
+    elif not (urls and len(urls) > 0) and (context == "No relevant information found in the knowledge base" or search) and not images:
+        spinner_placeholder.info("Shopping from Google...")
+        web_context = search_web(query=prompt, num=10)
+        if web_context and "No external search results found" not in web_context:
+            # Combine vector store results with web search if both are available
+            if context != "No relevant information found in the knowledge base.":
+                context = f"{context}\n\nAdditional information from web:\n{web_context}"
+            else:
+                context = web_context
     # Handle URL found but search not enabled
     elif urls and len(urls) > 0 and not search:
         context = "URLs found in the prompt, but search is not enabled."
@@ -103,18 +112,6 @@ def query_and_display_response(prompt, reasoning=False, search=False, images=Fal
             if "insufficient information" not in combined_context.lower() and "does not contain any information" not in combined_context.lower():
                 context = combined_context
     
-    # Handle web search if needed and not images mode
-    if (context == "No relevant information found in the knowledge base." or search) and not urls and not images:
-        spinner_placeholder.info("Searching the web for information...")
-        web_context = search_web(prompt)
-        if web_context and "No external search results found" not in web_context:
-            # Combine vector store results with web search if both are available
-            if context != "No relevant information found in the knowledge base.":
-                context = f"{context}\n\nAdditional information from web:\n{web_context}"
-            else:
-                context = web_context
-
-    # --- Response generation phase ---
     # Add LaTeX styles to enable proper formula rendering
     st.markdown(get_latex_styles(), unsafe_allow_html=True)
     
@@ -161,7 +158,8 @@ def query_and_display_response(prompt, reasoning=False, search=False, images=Fal
             current_chat = next((chat for chat in st.session_state.chat_sessions if chat["chat_id"] == st.session_state.current_chat_id), None)
             if current_chat:
                 current_chat["messages"].append({"question": prompt, "answer": full_response})
-                save_chat_sessions(st.session_state.chat_sessions, st.session_state.username)
+                username = st.session_state.get("username", "guest")
+                save_chat_sessions(st.session_state.chat_sessions, username)
                 
     spinner_placeholder.empty()
 

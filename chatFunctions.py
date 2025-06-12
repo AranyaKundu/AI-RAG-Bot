@@ -25,7 +25,10 @@ def save_chat_sessions(sessions, username: str):
     filename = get_chat_history_filename(username)
     ensure_chat_history_dir()  # Make sure directory exists
     with open(filename, "w") as f:
-        json.dump(sessions, f)
+        try:
+            json.dump(sessions, f, default=str)  # Use default=str to handle non-serializable objects
+        except TypeError as e:
+            print(f"Error saving chat sessions: {e}")
 
 # Load the chat sessions from chat history file
 def load_chat_sessions(username: str) -> list:
@@ -65,7 +68,7 @@ def append_message_to_current_chat(question: str, answer: str):
 # Define a chat title based on first prompt question
 def chat_title(first_prompt, max_length=50):
     if len(first_prompt) <= max_length:
-        return first_prompt.strip()
+        return first_prompt.text.strip()
     truncated = first_prompt[:max_length]
     last_space_index = truncated.rfind(" ")
     if last_space_index == -1:

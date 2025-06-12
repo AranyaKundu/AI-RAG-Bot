@@ -70,7 +70,7 @@ def add_to_collection(all_splits: list[Document], file_name: str, file_size_byte
 
 
 
-# Query the vector collection
+# Query the vector collection: semantic search algorithm
 def query_collection(prompt: str, api_key: str, n_results=10):
     # First, try to get results from the main collection
     try:

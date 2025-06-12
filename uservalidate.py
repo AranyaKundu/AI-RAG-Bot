@@ -1,9 +1,9 @@
 import sqlite3, bcrypt
 
 # These three lines are to solve a problem with streamlit cloud
-import pysqlite3 as sqlite3
-import sys
-sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
+# import pysqlite3 as sqlite3
+# import sys
+# sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 
 # Create Users first
 # Create Users.db if not exists already: import sqlite3

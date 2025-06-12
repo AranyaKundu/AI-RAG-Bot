@@ -1,11 +1,9 @@
-import os, tempfile, ocrmypdf, openpyxl, fitz, pytesseract, io
+import os, tempfile #, ocrmypdf, openpyxl, fitz, pytesseract, io
 import pandas as pd
 import streamlit as st
 from streamlit.runtime.uploaded_file_manager import UploadedFile
 from docx import Document as DocxDocument
 from PIL import Image
-from pyunpack import Archive
-import patoolib
 # Langchain imports
 from langchain_community.document_loaders import PyMuPDFLoader
 from langchain_core.documents import Document
@@ -43,46 +41,13 @@ def process_document(uploaded_file: UploadedFile) -> tuple:
         elif file_extension == "pdf":
             try:
                 # First try using OCRMyPDF to convert scanned images to searchable PDF
-                ocr_pdf_path = tempfile.NamedTemporaryFile(suffix=".pdf", delete=False).name
-                ocrmypdf.ocr(temp_file.name, ocr_pdf_path, rotate_pages=True, remove_background=True, 
-                            language="eng", deskew=True, force_ocr=True)
-                loader = PyMuPDFLoader(ocr_pdf_path)
+                loader = PyMuPDFLoader(temp_file.name)
                 documents = loader.load()
                 if not any(doc.page_content.strip() for doc in documents):
                     raise Exception("OCRMyPDF produced empty text")
             except Exception as e:
                 # If OCRMyPDF fails, try manual OCR approach
-                try:
-                    doc = fitz.open(temp_file.name)
-                    full_text = []
-                    for page_num in range(len(doc)):
-                        page = doc.load_page(page_num)
-                        text = page.get_text()
-                        if text.strip():
-                            full_text.append(text)
-                        else:
-                            # Extract image and OCR it
-                            pix = page.get_pixmap()
-                            img_bytes = pix.tobytes("png")
-                            path_to_tesseract = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
-                            if os.path.exists(path_to_tesseract):
-                                img = Image.open(io.BytesIO(img_bytes)) 
-                                pytesseract.tesseract_cmd = path_to_tesseract
-                                text = pytesseract.image_to_string(img)
-                                full_text.append(text)
-                            else:
-                                img = Image.open(io.BytesIO(img_bytes))
-                                text = pytesseract.image_to_string(img)
-                                full_text.append(text)
-                    documents = [Document(page_content="\n".join(full_text), metadata={"source": uploaded_file.name})]
-                    doc.close()
-                except Exception as nested_e:
-                    st.error(f"Error processing PDF: {str(e)}. Fallback OCR also failed: {str(nested_e)}")
-                    os.unlink(temp_file.name)
-                    return [], 0
-            finally:
-                if os.path.exists(ocr_pdf_path):
-                    os.unlink(ocr_pdf_path)
+                st.error(f"Failed to read document, maybe this is a scanned pdf file. {str(e)}")
         elif file_extension == "txt":
             with open(temp_file.name, "r", encoding="utf-8", errors="replace") as f:
                 text = f.read()
@@ -96,6 +61,14 @@ def process_document(uploaded_file: UploadedFile) -> tuple:
             csv_df = pd.read_csv(temp_file.name)
             text = csv_df.to_csv(index=False)
             documents.append(Document(page_content=text, metadata = {"source": uploaded_file.name}))
+        
+        elif file_extension in ["py", "r", "js", "jsx", "ts", "tsx", "html", "htm", "xml", "css", "scss", "less", 
+                                "java", "c", "h", "cpp", "hpp", "cxx", "cc", "cs", "php", "rb", "go", "sh", 
+                                "bash", "swift", "kt", "kts", "rs", "scala", "pl", "pm", "sql", "yaml", "yml"]:
+            # Read code files as plain text
+            with open(temp_file.name, "r", encoding="utf-8", errors="replace") as f:
+                text = f.read()
+            documents.append(Document(page_content=text, metadata={"source": uploaded_file.name}))
         else:
             st.error(f"Unsupported file format: {file_extension}. Please upload a PDF, DOCX, TXT, Excel, or CSV file.")
             os.unlink(temp_file.name)
@@ -118,15 +91,4 @@ def process_document(uploaded_file: UploadedFile) -> tuple:
     
     return all_splits, file_size_bytes
 
-def process_zip(uploaded_zip):
-    with tempfile.TemporaryDirectory() as tmpdir:
-        zip_path = os.path.join(tmpdir, "uploaded.zip")
-        with open(zip_path, "wb") as f:
-            f.write(uploaded_zip.getbuffer())
-        
-        Archive(zip_path).extractall(tmpdir)
-
-        for files in os.walk(tmpdir):
-            for file in files:
-                yield file
     

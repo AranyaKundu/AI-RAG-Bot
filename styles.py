@@ -4,9 +4,12 @@ def get_main_styles():
     :root {
         --primary-color: #4361ee;
         --background-color: #f5f7fa;
+        --background-color-hover: #2f2f2f;
+        --favorite-color: #ffd700;
         --footer-background-color: #ffffff;
         --secondary-background: #f9fafc;
-        --text-color: #333;
+        --text-color: #333333;
+        --text-color-hover: #daa520;
         --sidebar-color: #f0f2f6;
         --card-background: #ffffff;
         --card-shadow: rgba(0, 0, 0, 0.05);
@@ -51,6 +54,9 @@ def get_main_styles():
     .stButton button:hover {
         transform: translateY(-2px);
     }
+    textarea [data-testid="stChatInputTextArea"] {
+        font-size: 1rem !important;
+    }
     </style>
     """
 
@@ -65,6 +71,39 @@ def get_sidebar_button_styles():
         text-align: left;
         justify-content: left;
         max-width: 250px;  
+    }
+    
+    div[data-baseweb="select"] :hover, 
+    div[data-baseweb="select"] :focus{
+        background-color: var(--background-color-hover);
+        color: var(--text-color-hover);
+        fill: var(--text-color-hover);
+    }
+    
+    div[data-testid="stSelectbox"] label[data-testid="stWidgetLabel"],
+    .stNumberInput label[data-testid="stWidgetLabel"]{
+        display: none !important;
+    }
+
+    /* Style the dropdown options container using data-testid */
+    # ul[data-testid="stSelectboxVirtualDropdown"] {
+    #     line-height: 1 !important;
+    #     background-color: var(--background-color) !important;
+    #     height: auto !important;
+    #     padding: 0px !important;
+    # }
+
+    # [data-testid="stSelectboxVirtualDropdown"] > div, [data-testid="stSelectboxVirtualDropdown"] > div > div {
+    #     height: auto !important;
+    #     max-height: 100px !important
+    # }
+
+    .stTooltipHoverTarget {
+        line-height: 1.4 !important;
+    }
+    /* Style cursor to pointer */
+    div[data-testid="stElementContainer"] {
+        cursor: pointer;
     }
     </style>
     """
@@ -118,9 +157,9 @@ def get_button_styles():
     .stButton button:hover {
         transform: translateY(-2px);
         box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        background-color: var(--primary-color);
+        background-color: var(--background-color-hover);
         border: none;
-        color: var(--card-background);
+        color: var(--text-color-hover);
     }
     /* Primary button styling */
     .stButton button[data-testid="baseButton-primary"] {
@@ -152,6 +191,12 @@ def get_main_section_styles():
         overflow-x: hidden;
         overflow-y: auto;
     }
+    .stSlider > label[data-testid="stWidgetLabel"] {
+        display: none !important;
+    }
+    div[data-testid="stSliderTickBarMin"], div[data-testid="stSliderTickBarMax"] {
+        display: none !important;
+    }
     </style>
     """
 
@@ -159,15 +204,16 @@ def get_bottom_container_styles():
     return """
     {
         position: fixed;
-        align-content: center;
+        height: auto;
         bottom: 35px;
         left: 50%;
         transform: translateX(-50%);
         width: 70%;
         max-width: 850px;
         background-color: var(--card-background);
-        border-radius: 20px;
-        padding: 5px;
+        border-radius: 28px;
+        border: 1px solid var(--sidebar-color);
+        padding: 12px;
         box-shadow: 0 5px 15px var(--card-shadow);
         display: flex;
         flex-direction: column;
@@ -194,7 +240,8 @@ def get_bottom_content_styles():
     }
     """
 
-def get_user_dropdown_styles(username="User", month="Current Month", total_cost=0.0):
+def get_user_dropdown_styles(username, month="Current Month", total_cost=0.0):
+    
     return f"""
     <style>
     /* User dropup styling */
@@ -202,7 +249,7 @@ def get_user_dropdown_styles(username="User", month="Current Month", total_cost=
         position: fixed;
         bottom: 10px;
         right: 20px;
-        z-index: 999999999;
+        z-index: 99999999;
     }}
     .user-dropdown img {{
         width: 30px;
@@ -230,7 +277,7 @@ def get_user_dropdown_styles(username="User", month="Current Month", total_cost=
     .user-dropdown:focus-within .dropdown-content {{
         display: block;
         cursor: pointer;
-        z-index: 999999999;
+        z-index: 99999999;
         animation: fadeIn 0.3s;
     }}
     @keyframes fadeIn {{
@@ -276,9 +323,7 @@ def get_user_dropdown_styles(username="User", month="Current Month", total_cost=
         <div class="dropdown-content">
             <p class="dropdown-username">{username}</p>
             <p class="dropdown-usage">Usage - {month}: ${total_cost:.2f}</p>
-            <p class="dropdown-logout">
-                <a href="?logout=1" target="_parent">Logout</a>
-            </p>
+            <p class="dropdown-logout"><a href="?logout=1" target="_parent">Logout</a></p>
         </div>
     </div>
     """

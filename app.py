@@ -1,12 +1,13 @@
 import time
 import streamlit as st
+import os
 from uservalidate import create_users_table, verify_user, add_user
 from styles import (
     get_main_styles, 
     get_welcome_styles
 )
 from userPage import user_page
-from adminPage import admin_page
+
 
 # Get the API Key
 api_key = st.secrets["api_keys"]["openai"]
@@ -41,28 +42,16 @@ if __name__ == '__main__':
     if "authenticated" not in st.session_state:
         st.session_state["authenticated"] = False
 
+    # Otherwise proceed with normal app flow
+    if st.session_state.get("authenticated") and "logout" in st.query_params:
+        for key in list(st.session_state.keys()):
+            del st.session_state[key]
+        st.query_params.clear()
+        st.rerun()
+
     if st.session_state.get("authenticated"):
-        if "logout" in st.query_params:
-            for key in list(st.session_state.keys()):
-                del st.session_state[key]
-            st.query_params.clear()
-            st.rerun()
-
         username = st.session_state["username"]
-        
-        # Route to the appropriate page based on username
-        if username == "admin":
-            result = admin_page(username)
-        else:
-            result = user_page(username)
-            
-        # Handle logout request from either page
-        if result == "logout":
-            for key in list(st.session_state.keys()):
-                del st.session_state[key]
-            st.query_params.clear()
-            st.rerun()
-
+        result = user_page(username)
     else:
         # Login and signup screens
         st.markdown(get_welcome_styles(), unsafe_allow_html=True)
