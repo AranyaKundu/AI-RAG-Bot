@@ -18,4 +18,5 @@ pysqlite3-binary
 pymupdf
 ocrmypdf
 crewai
+crewai-tools
 sentence-transformers
