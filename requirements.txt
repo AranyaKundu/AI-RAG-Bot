@@ -18,3 +18,4 @@ pysqlite3-binary
 pymupdf
 ocrmypdf
 crewai
+sentence-transformers
