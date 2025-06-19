@@ -4,7 +4,6 @@ from streamlit_extras.stylable_container import stylable_container
 from streamlit_extras.floating_button import floating_button
 from fileprocessing import process_document
 from vectordb import add_to_collection
-import chromadb
 from chatFunctions import save_chat_sessions, load_chat_sessions, new_chat_id
 from streamlitfunctions import handle_chat_button, query_and_display_response
 from chatFunctions import append_message_to_current_chat
