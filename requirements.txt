@@ -1,3 +1,4 @@
+CrewAI
 streamlit>=1.43.2
 streamlit_extras>=0.5.5
 openai>=1.66.3
@@ -5,7 +6,7 @@ langchain>=0.3.19
 langchain-community>=0.3.18
 langchain-text-splitters>=0.0.1
 python-docx>=1.1.2
-chromadb>=0.5.10
+chromadb>=0.6.3
 pandas>=2.0.0
 openpyxl>=3.1.5
 bcrypt>=4.0.1
@@ -17,7 +18,3 @@ patool>=4.0.0
 pysqlite3-binary
 pymupdf
 ocrmypdf
-crewai==0.126.0
-crewai-tools==0.47.0
-pydantic
-sentence-transformers
